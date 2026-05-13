@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfficialX</title>
+    <link rel="icon" type="image/jpeg" href="https://i.pinimg.com/736x/a4/f0/c1/a4f0c102c6049e2c3440a27caed61534.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030305;
+            --panel: rgba(13, 14, 20, 0.4);
+            --border: rgba(255, 255, 255, 0.05);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.3);
+            --secondary: #18181b;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --accent: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 50% -20%, var(--primary-glow) 0%, transparent 50%),
+                radial-gradient(circle at 0% 0%, rgba(139, 92, 246, 0.05) 0%, transparent 30%);
+        }
+
+        /* ── MESH BACKGROUND ── */
+        .mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+            filter: blur(100px);
+            pointer-events: none;
+        }
+
+        .mesh-1 {
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 50%;
+            height: 50%;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: move 20s infinite alternate;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            to {
+                transform: translate(20%, 20%) rotate(360deg);
+            }
+        }
+
+        .nav-container {
+            position: fixed;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: fit-content;
+            z-index: 1000;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            background: rgba(10, 10, 15, 0.4);
+            backdrop-filter: blur(24px) saturate(180%);
+            border-radius: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            gap: 20px;
+        }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-main);
+            padding: 0 15px;
+        }
+
+        .logo-wrap img {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 5px;
+            padding: 4px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 100px;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 8px 18px;
+            border-radius: 100px;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-login-pill {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            text-decoration: none;
+            padding: 10px 24px;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn-login-pill:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        /* ── LIGHT MODE ─────────────────────────────────────────────────── */
+        body.light-mode {
+            --bg: #f8fafc;
+            --panel: rgba(255, 255, 255, 0.8);
+            --border: rgba(0, 0, 0, 0.05);
+            --text-main: #0f172a;
+            --text-dim: #64748b;
+            background-image:
+                radial-gradient(circle at 50% -10%, rgba(79, 70, 229, 0.05) 0%, transparent 60%);
+        }
+
+        body.light-mode .nav {
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-mode .nav-links {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        body.light-mode .feature-card {
+            background: #fff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        /* ── HERO ───────────────────────────────────────────────────────── */
+        .hero {
+            text-align: center;
+            padding: 120px 20px 60px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero h1 {
+            font-size: 3.8rem;
+            font-weight: 800;
+            margin: 0 0 25px 0;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            background: linear-gradient(to right, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-dim);
+            font-size: 1.15rem;
+            max-width: 650px;
+            margin: 0 auto 40px auto;
+            line-height: 1.6;
+        }
+
+        .hero-btns {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn-primary, .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            text-decoration: none;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-primary:hover,
+        .btn-secondary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* ── FEATURES SECTION ───────────────────────────────────────────── */
+        .features-section {
+            padding: 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .section-badge {
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .features-section h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 0 0 15px 0;
+            letter-spacing: -1.5px;
+        }
+
+        .features-section p.sub {
+            color: var(--text-dim);
+            margin-bottom: 60px;
+            font-size: 1.1rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            text-align: left;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 32px;
+            padding: 45px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.1), transparent 70%);
+            opacity: 0;
+            transition: 0.5s;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0 0 15px 0;
+            letter-spacing: -0.5px;
+        }
+
+        .feature-card p {
+            color: var(--text-dim);
+            line-height: 1.7;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 3.5rem;
+                letter-spacing: -2px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ── STYLIZED TITLES ────────────────────────────────────────────── */
+        .styled-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .styled-title span {
+            color: var(--primary);
+            font-weight: 900;
+            text-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        /* ── COMMAND TABS ───────────────────────────────────────────────── */
+        .tabs-container {
+            margin-top: 40px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 30px;
+            padding-bottom: 1px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 15px 0;
+            cursor: pointer;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            color: var(--text-main);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .tab-content {
+            display: none;
+            padding-top: 30px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── COMMAND LIST ───────────────────────────────────────────────── */
+        .cmd-list-item {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            padding: 25px 0;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            transition: 0.3s;
+        }
+
+        .cmd-list-item:hover {
+            background: rgba(255, 255, 255, 0.01);
+            padding-left: 10px;
+        }
+
+        .cmd-name {
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 0.95rem;
+            letter-spacing: 0.2px;
+        }
+
+        .cmd-desc {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* ── FEATURE GRID UPDATE ────────────────────────────────────────── */
+        .feature-item-styled {
+            text-align: left;
+            padding: 30px;
+            border-left: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .feature-item-styled h3 {
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 0.3px;
+        }
+
+        .feature-item-styled h3 span {
+            color: var(--primary);
+            font-size: 0.8rem;
+            font-weight: 900;
+        }
+
+        .feature-item-styled p {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mesh">
+        <div class="mesh-1"></div>
+    </div>
+    <div class="nav-container">
+        <nav class="nav">
+            <a href="/" class="logo-wrap">
+                <img src="https://i.pinimg.com/736x/a4/f0/c1/a4f0c102c6049e2c3440a27caed61534.jpg">
+                <div class="logo">OfficialX</div>
+            </a>
+
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#about">About</a>
+                <a href="#features">Features</a>
+                <a href="#commands">Commands</a>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="theme-toggle" id="theme-toggle">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </div>
+                <a href="/api/auth/login" class="btn-login-pill">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                        <path
+                            d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2758-3.68-.2758-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1971.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z" />
+                    </svg>
+                    Login
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+
+        const sunIcon = `
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+        `;
+
+        const moonIcon = `
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        `;
+
+        function updateIcon() {
+            themeToggle.innerHTML = body.classList.contains('light-mode') ? moonIcon : sunIcon;
+        }
+
+        if (localStorage.getItem('theme') === 'light') {
+            body.classList.add('light-mode');
+            updateIcon();
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+            const isLight = body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            updateIcon();
+        });
+    </script>
+
+    <div class="hero">
+        <div class="badge">Introducing Anti-Nuke Protection →</div>
+        <h1>Modern Solutions for Server Protection</h1>
+        <p>A powerful Discord bot for security & moderation. Protect your server with advanced anti-nuke features and
+            real-time threat detection.</p>
+        <div class="hero-btns">
+            <a href="/api/auth/login" class="btn-primary">
+                <svg width="22" height="22" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a67.55,67.55,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96,46,95.89,53,91.08,65.69,84.69,65.69Z"/></svg>
+                Invite to Discord
+            </a>
+            <a href="https://discord.gg/your-invite-code" target="_blank" class="btn-secondary">
+                Support Server
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </a>
+        </div>
+    </div>
+
+    <div id="about" class="features-section" style="padding-top: 60px;">
+        <span class="section-badge">About OfficialX</span>
+        <h2>The Ultimate Defense System</h2>
+        <p class="sub">OfficialX is engineered to provide absolute security for your Discord communities, combining
+            high-speed response with intuitive management.</p>
+        <div
+            style="background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 40px; text-align: left; max-width: 800px; margin: 0 auto;">
+            <p style="color: var(--text-dim); font-size: 1rem; margin-bottom: 20px;">Built by security experts,
+                OfficialX focuses on what matters: **Stability, Speed, and Simplicity.** Our anti-nuke algorithms are
+                tested against the most aggressive raid tools to ensure your server remains standing no matter what.</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div style="display: flex; gap: 10px; align-items: center; font-size: 0.9rem;">
+                    <span style="color: var(--primary);">✓</span>
+                    <span>High-Speed Anti-Nuke</span>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center; font-size: 0.9rem;">
+                    <span style="color: var(--primary);">✓</span>
+                    <span>Auto-Restore System</span>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center; font-size: 0.9rem;">
+                    <span style="color: var(--primary);">✓</span>
+                    <span>Real-time Logs</span>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center; font-size: 0.9rem;">
+                    <span style="color: var(--primary);">✓</span>
+                    <span>24/7 Monitoring</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="features" class="features-section">
+        <div class="styled-title"><span>//</span> OfficialX Features</div>
+        <p class="sub" style="text-align: left; margin-bottom: 40px; font-size: 0.9rem;">Absolute protection for your
+            Discord community.</p>
+
+        <div class="features-grid" style="grid-template-columns: repeat(3, 1fr); gap: 0;">
+            <div class="feature-item-styled">
+                <h3><span>$</span> Anti-Bot</h3>
+                <p>Detects and punishes unauthorized bot integration instantly.</p>
+            </div>
+            <div class="feature-item-styled">
+                <h3><span>$</span> Anti-Spam</h3>
+                <p>Advanced real-time detection for message flooding and spam.</p>
+            </div>
+            <div class="feature-item-styled">
+                <h3><span>$</span> Anti-Link</h3>
+                <p>Automatically purges unauthorized URLs and server invites.</p>
+            </div>
+            <div class="feature-item-styled">
+                <h3><span>$</span> Anti-Webhook</h3>
+                <p>Neutralizes unauthorized webhook creation and abuse.</p>
+            </div>
+            <div class="feature-item-styled">
+                <h3><span>$</span> Anti-Selfbot</h3>
+                <p>Elite detection for automated accounts bypassing standard filters.</p>
+            </div>
+            <div class="feature-item-styled">
+                <h3><span>$</span> Anti-Nuke</h3>
+                <p>Sub-millisecond protection for channels and roles.</p>
+            </div>
+            <div class="feature-item-styled">
+                <h3><span>$</span> Anti-Raid</h3>
+                <p>Dynamic join gates to halt automated server attacks.</p>
+            </div>
+            <div class="feature-item-styled">
+                <h3><span>$</span> Lockdown</h3>
+                <p>Emergency protocol that freezes server activity instantly.</p>
+            </div>
+            <div class="feature-item-styled">
+                <h3><span>$</span> Auto-Restore</h3>
+                <p>Instant restoration of server structure from snapshots.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="commands" class="features-section" style="background: rgba(255, 255, 255, 0.003); padding-top: 60px;">
+        <div class="styled-title"><span>// @</span> Commands</div>
+        <p class="sub" style="text-align: left; margin-bottom: 30px; font-size: 0.9rem;">
+            Use <code
+                style="background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; color: var(--primary); font-size: 0.8rem;">/</code>
+            or <code
+                style="background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; color: var(--primary); font-size: 0.8rem;">Prefix</code>
+            · Hybrid Support
+        </p>
+
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="openTab(event, 'tab-security')">Security</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-moderation')">Moderation</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-utility')">Utility</button>
+        </div>
+
+        <div id="tab-security" class="tab-content active">
+            <div class="cmd-list-item">
+                <div class="cmd-name">/antinuke</div>
+                <div class="cmd-desc">Configure security modules, toggle protection, and set punishments.</div>
+            </div>
+            <div class="cmd-list-item">
+                <div class="cmd-name">/antiraid</div>
+                <div class="cmd-desc">Setup join gates, captcha verification, and raid limits.</div>
+            </div>
+            <div class="cmd-list-item">
+                <div class="cmd-name">/whitelist</div>
+                <div class="cmd-desc">Manage trusted users with immunity from security systems.</div>
+            </div>
+            <div class="cmd-list-item">
+                <div class="cmd-name">/backup</div>
+                <div class="cmd-desc">Create server snapshots or restore structure from versions.</div>
+            </div>
+        </div>
+
+        <div id="tab-moderation" class="tab-content">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px;">
+                <div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/ban</div>
+                        <div class="cmd-desc">Permanently ban a member from the server with logs.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/kick</div>
+                        <div class="cmd-desc">Remove a member from the server instantly.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/timeout</div>
+                        <div class="cmd-desc">Mute a member for a specific duration.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/purge</div>
+                        <div class="cmd-desc">Bulk delete up to 100 messages in a channel.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/purgeuser</div>
+                        <div class="cmd-desc">Delete messages from a specific user only.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/purgebots</div>
+                        <div class="cmd-desc">Expel all unauthorized bots from your server.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/lock</div>
+                        <div class="cmd-desc">Lock the current channel for @everyone.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/lockall</div>
+                        <div class="cmd-desc">Lock all text channels in the entire server.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/hide</div>
+                        <div class="cmd-desc">Hide a channel from all non-staff members.</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/warn</div>
+                        <div class="cmd-desc">Issue a formal warning to a specific member.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/warns</div>
+                        <div class="cmd-desc">View the full warning history of a user.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/automod</div>
+                        <div class="cmd-desc">Setup advanced keyword and spam filters.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/logging</div>
+                        <div class="cmd-desc">Configure channels for all audit log tracking.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/addrole</div>
+                        <div class="cmd-desc">Assign a specific role to a server member.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/rrole</div>
+                        <div class="cmd-desc">Mass remove a role from everyone who has it.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/nickname</div>
+                        <div class="cmd-desc">Change or reset a member's server nickname.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/steal</div>
+                        <div class="cmd-desc">Steal an emoji from another server via URL/ID.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/slowmode</div>
+                        <div class="cmd-desc">Set the rate limit per user for a channel.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-utility" class="tab-content">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px;">
+                <div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/avatar</div>
+                        <div class="cmd-desc">Get a high-quality display of a user's avatar.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/banner</div>
+                        <div class="cmd-desc">Retrieve and view a user's custom profile banner.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/userinfo</div>
+                        <div class="cmd-desc">Get detailed profile, ID, and join dates for any user.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/serverinfo</div>
+                        <div class="cmd-desc">View server statistics, owner info, and boost tier.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/snipe</div>
+                        <div class="cmd-desc">Retrieve the most recently deleted message in a channel.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/stats</div>
+                        <div class="cmd-desc">View member count, bots vs humans, and online status.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/ping</div>
+                        <div class="cmd-desc">Check the bot's real-time latency and heartbeat.</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/instagram</div>
+                        <div class="cmd-desc">Fetch profile statistics and info from Instagram.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/tiktok</div>
+                        <div class="cmd-desc">Search for TikTok profiles and view follower/like stats.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/youtube</div>
+                        <div class="cmd-desc">Get detailed stats for any YouTube channel via username.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/verification</div>
+                        <div class="cmd-desc">Setup and manage the secure entry gateway system.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/afk</div>
+                        <div class="cmd-desc">Set a status to notify others when you are away.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/premium</div>
+                        <div class="cmd-desc">View your subscription status and premium benefits.</div>
+                    </div>
+                    <div class="cmd-list-item">
+                        <div class="cmd-name">/uptime</div>
+                        <div class="cmd-desc">Check how long the bot has been running continuously.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer style="padding: 80px 10% 40px 10%; border-top: 1px solid var(--border); margin-top: 100px; background: rgba(0,0,0,0.1);">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 40px; margin-bottom: 60px;">
+            <div style="max-width: 300px;">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                    <img src="https://i.pinimg.com/736x/a4/f0/c1/a4f0c102c6049e2c3440a27caed61534.jpg" style="width: 32px; height: 32px; border-radius: 8px;">
+                    <span style="font-size: 1.4rem; font-weight: 800;">OfficialX</span>
+                    <div style="display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem;">
+                        <span style="width: 8px; height: 8px; background: #4ade80; border-radius: 50%; display: inline-block;"></span> System Status
+                    </div>
+                </div>
+                <p style="color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; margin-bottom: 25px;">Create feature-rich, customizable and modern Discord servers with OfficialX.</p>
+            </div>
+            
+
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); color: var(--text-dim); font-size: 0.85rem; flex-wrap: wrap; gap: 20px;">
+            <div>Copyright © 2026 offcial.xyz - All Rights Reserved.</div>
+            <div style="display: flex; gap: 20px;">
+                <a href="https://discord.gg/your-invite-code" target="_blank" style="color: var(--text-dim); transition: 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-dim)'">
+                    <svg width="20" height="20" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a67.55,67.55,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96,46,95.89,53,91.08,65.69,84.69,65.69Z"/></svg>
+                </a>
+                <a href="https://t.me/i6fwx" target="_blank" style="color: var(--text-dim); transition: 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-dim)'">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.42.9-4.02 2.66-.38.25-.72.38-1.03.37-.34-.01-.99-.19-1.48-.35-.6-.2-1.07-.3-1.03-.64.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .24z"/></svg>
+                </a>
+                <a href="https://github.com/0x29X" target="_blank" style="color: var(--text-dim); transition: 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-dim)'">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            const tablinks = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfficialX | Dashboard Control</title>
+    <link rel="icon" type="image/jpeg" href="https://i.pinimg.com/736x/a4/f0/c1/a4f0c102c6049e2c3440a27caed61534.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        :root {
+            --bg: #030305;
+            --sidebar: rgba(10, 10, 15, 0.4);
+            --panel: rgba(20, 20, 25, 0.4);
+            --border: rgba(255, 255, 255, 0.05);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.2);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --accent: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+            background-image:
+                radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.05) 0%, transparent 40%);
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar);
+            backdrop-filter: blur(40px);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 50px;
+            cursor: pointer;
+            padding: 0 10px;
+        }
+
+        .brand img {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .brand h2 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-label {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 25px 0 10px 15px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        /* ── MAIN CONTENT ── */
+        .main-container {
+            flex: 1;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            padding: 25px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            background: rgba(3, 3, 5, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .server-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .server-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 16px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .server-meta h1 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+
+        .server-meta span {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px 18px;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+        }
+
+        .user-pill img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-area {
+            padding: 50px;
+            max-width: 1300px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* ── CARDS ── */
+        .list-card {
+            background: var(--panel);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            margin-bottom: 40px;
+        }
+
+        .card-header {
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .icon-wrap {
+            width: 54px;
+            height: 54px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            border: 1px solid var(--border);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--panel);
+            padding: 30px;
+            border-radius: 28px;
+            border: 1px solid var(--border);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-card h2 {
+            margin: 15px 0 0;
+            font-size: 2.2rem;
+            font-weight: 900;
+        }
+
+        /* ── TOGGLES ── */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .toggle-item {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 22px 28px;
+            border-radius: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+        }
+
+        .toggle-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .stat-card h2 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .feature-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 30px;
+            border-radius: 24px;
+            position: relative;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary-glow);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon-wrap {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-glow);
+            color: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .card-title h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        .card-title p {
+            margin: 5px 0 0 0;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .sub-toggles {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border);
+        }
+
+        .toggle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 12px 16px;
+            border-radius: 12px;
+        }
+
+        .toggle-item span {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* ── SWITCH STYLES ─────────────────────────────────────────────── */
+        .switch {
+            position: relative;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #2a2a35;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background: var(--success);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(22px);
+        }
+
+        /* ── WHITELIST & LOGS ──────────────────────────────────────────── */
+        .list-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .input-group input {
+            flex-grow: 1;
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            color: #fff;
+            font-family: inherit;
+        }
+
+        select,
+        input[type="text"],
+        input[type="number"] {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 10px;
+            color: var(--text-main);
+            outline: none;
+            cursor: pointer;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        body.light-mode select,
+        body.light-mode input[type="text"],
+        body.light-mode input[type="number"] {
+            background: rgba(255, 255, 255, 0.8);
+            color: #0f172a;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        select option {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        body.light-mode select option {
+            background: #fff;
+            color: #0f172a;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            height: 45px;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+            filter: brightness(1.2);
+        }
+
+        .btn-add:active {
+            transform: translateY(0);
+        }
+
+        .btn-error {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-error:hover {
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #047857);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6366f1, #4338ca);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b, #b45309);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+
+        .btn-warning:hover {
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-dark {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid var(--border);
+        }
+
+        .btn-dark:hover {
+            background: #334155;
+        }
+
+        .whitelist-items {
+            display: grid;
+            gap: 10px;
+        }
+
+        .wl-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 14px;
+            border: 1px solid transparent;
+        }
+
+        .wl-item:hover {
+            border-color: var(--border);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .wl-item .info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .wl-item .info b {
+            font-size: 0.9rem;
+        }
+
+        .wl-item .info span {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono';
+        }
+
+        .btn-remove {
+            background: rgba(255, 71, 87, 0.1);
+            color: var(--error);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .log-terminal {
+            background: #000;
+            border-radius: 18px;
+            padding: 25px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            height: 600px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            color: #ccc;
+        }
+
+        .log-line {
+            margin-bottom: 10px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .log-ts {
+            color: #555;
+        }
+
+        .tag-info {
+            color: var(--primary);
+        }
+
+        .tag-warn {
+            color: var(--warning);
+        }
+
+        .tag-danger {
+            color: var(--error);
+        }
+
+        /* ── MODALS ─────────────────────────────────────────────────────── */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 30px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal h2 {
+            margin: 0 0 15px;
+        }
+
+        .modal p {
+            color: var(--text-dim);
+            margin-bottom: 30px;
+        }
+
+        .modal-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-cancel {
+            background: #222;
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .btn-confirm {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        /* ── SELECTOR ───────────────────────────────────────────────────── */
+        select {
+            background: #000;
+            color: #fff;
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 12px;
+            font-family: inherit;
+            width: 100%;
+        }
+
+        .toast-shelf {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 2000;
+        }
+
+        .toast {
+            background: var(--panel);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            padding: 15px 25px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #222;
+            border-radius: 10px;
+        }
+
+        .dashboard-section {
+            display: none;
+        }
+
+        .dashboard-section.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="toast-shelf" id="toast-shelf"></div>
+
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal">
+            <h2 id="modal-title">Verification Required</h2>
+            <p id="modal-desc">Are you sure you want to proceed with this action?</p>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeModal()">CANCEL</button>
+                <button class="btn-confirm" id="btn-modal-confirm">CONFIRM</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand" onclick="window.location.href='/select'">
+            <img src="https://i.pinimg.com/736x/a4/f0/c1/a4f0c102c6049e2c3440a27caed61534.jpg" id="brand-icon"
+                style="border-radius: 8px;">
+            <h2>OfficialX</h2>
+        </div>
+
+        <nav class="nav-group">
+            <span class="nav-label">Core System</span>
+            <div class="nav-item" onclick="showSection('overview', this)">
+                <span>📊</span> Overview
+            </div>
+            <div class="nav-item" onclick="showSection('antinuke', this)">
+                <span>🛡️</span> Anti-Nuke
+            </div>
+            <div class="nav-item" onclick="showSection('antiselfbot', this)">
+                <span>🤖</span> Anti-Selfbot
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-container">
+        <header class="top-bar">
+            <div class="server-info">
+                <img src="" id="server-icon" class="server-icon">
+                <div class="server-meta">
+                    <h1 id="server-name">Loading...</h1>
+                    <span id="server-id">ID: 00000000000000</span>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="theme-toggle" id="dashboard-theme-toggle"
+                    style="width: 40px; height: 40px; border-radius: 50%; background: var(--panel); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </div>
+                <div class="user-pill">
+                    <img src="" id="user-avatar">
+                    <b id="user-name">User</b>
+                </div>
+            </div>
+        </header>
+
+        <script>
+            const dashThemeToggle = document.getElementById('dashboard-theme-toggle');
+            if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+
+            dashThemeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-mode');
+                localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+            });
+        </script>
+
+        <div class="content-area">
+
+            <!-- OVERVIEW SECTION -->
+            <section id="overview" class="dashboard-section active">
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <span>Status</span>
+                        <h2 id="stat-status" style="color: var(--success);">Protected</h2>
+                    </div>
+                    <div class="stat-card">
+                        <span>Whitelist Roles</span>
+                        <h2 id="stat-wl-roles">0</h2>
+                    </div>
+                    <div class="stat-card">
+                        <span>Whitelist Users</span>
+                        <h2 id="stat-wl-users">0</h2>
+                    </div>
+                    <div class="stat-card">
+                        <span>Members</span>
+                        <h2 id="stat-members">0</h2>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ANTI-NUKE SECTION -->
+            <section id="antinuke" class="dashboard-section">
+                <div class="list-card" style="margin-bottom: 25px; border-left: 4px solid var(--success);">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <div class="icon-wrap">🛡️</div>
+                            <div>
+                                <h3>Anti-Nuke</h3>
+                                <p>Toggle the core OfficialX protection system.</p>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="anti_nuker" onchange="updateConfig('anti_nuker', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="list-card">
+                    <div class="card-title" style="margin-bottom: 30px;">
+                        <div class="icon-wrap">⚙️</div>
+                        <div>
+                            <h3>Anti-Nuke Configuration</h3>
+                            <p>Configure exactly what OfficialX should protect.</p>
+                        </div>
+                    </div>
+
+                    <div
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 16px;">
+                        <div class="toggle-item">
+                            <span>Auto-Restore Channels/Roles</span>
+                            <label class="switch">
+                                <input type="checkbox" id="auto_restore"
+                                    onchange="updateConfig('auto_restore', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Log Channel</span>
+                            <select id="log_channel" onchange="updateConfig('log_channel', this.value)"
+                                style="width: 180px;">
+                                <option value="">Select Channel...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="feature-grid">
+                        <div class="toggle-item">
+                            <span>Channel Creation</span>
+                            <label class="switch">
+                                <input type="checkbox" id="anti_channel_create"
+                                    onchange="updateConfig('anti_channel_create', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Channel Deletion</span>
+                            <label class="switch">
+                                <input type="checkbox" id="anti_channel_delete"
+                                    onchange="updateConfig('anti_channel_delete', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Channel Updates</span>
+                            <label class="switch">
+                                <input type="checkbox" id="anti_channel_update"
+                                    onchange="updateConfig('anti_channel_update', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Role Creation</span>
+                            <label class="switch">
+                                <input type="checkbox" id="anti_role_create"
+                                    onchange="updateConfig('anti_role_create', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Role Deletion</span>
+                            <label class="switch">
+                                <input type="checkbox" id="anti_role_delete"
+                                    onchange="updateConfig('anti_role_delete', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Role Updates</span>
+                            <label class="switch">
+                                <input type="checkbox" id="anti_role_update"
+                                    onchange="updateConfig('anti_role_update', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Webhook Creation</span>
+                            <label class="switch">
+                                <input type="checkbox" id="anti_webhook_create"
+                                    onchange="updateConfig('anti_webhook_create', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Guild Updates</span>
+                            <label class="switch">
+                                <input type="checkbox" id="anti_guild_update"
+                                    onchange="updateConfig('anti_guild_update', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Bot Add Protection</span>
+                            <label class="switch">
+                                <input type="checkbox" id="anti_bot_add"
+                                    onchange="updateConfig('anti_bot_add', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item">
+                            <span>Kick & Ban Protection</span>
+                            <label class="switch">
+                                <input type="checkbox" id="anti_kick_ban"
+                                    onchange="updateConfig('anti_kick_ban', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div
+                        style="margin-top: 40px; padding: 25px; background: rgba(0,0,0,0.1); border-radius: 20px; border: 1px solid var(--border);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3 style="margin:0;">Punishment Protocol</h3>
+                                <p style="color: var(--text-dim); margin: 5px 0 0; font-size: 0.85rem;">Action taken
+                                    against unauthorized users.</p>
+                            </div>
+                            <div style="width: 200px;">
+                                <select id="punishment_type" onchange="updateConfig('punishment_type', this.value)">
+                                    <option value="ban">Permanent Ban</option>
+                                    <option value="kick">Server Kick</option>
+                                    <option value="strip">Strip All Roles</option>
+                                    <option value="timeout">24h Timeout</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="antiselfbot" class="dashboard-section">
+                <div class="list-card" style="margin-bottom: 25px; border-left: 4px solid var(--primary);">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <div class="icon-wrap">🤖</div>
+                            <div>
+                                <h3>Anti-Selfbot System</h3>
+                                <p>Protect against user-account bots and spam automation.</p>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="anti_selfbot"
+                                onchange="updateConfig('anti_selfbot', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="icon-wrap">💬</div>
+                                <div>
+                                    <h3>Message Spam</h3>
+                                    <p>Block duplicate message automation.</p>
+                                </div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="anti_spam"
+                                    onchange="updateConfig('anti_spam', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="icon-wrap">🌊</div>
+                                <div>
+                                    <h3>Flood Protection</h3>
+                                    <p>Prevent rapid message flooding.</p>
+                                </div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="anti_flood"
+                                    onchange="updateConfig('anti_flood', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="icon-wrap">🏷️</div>
+                                <div>
+                                    <h3>Mass Mention</h3>
+                                    <p>Block abuse of @everyone/role pings.</p>
+                                </div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="anti_mention"
+                                    onchange="updateConfig('anti_mention', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="icon-wrap">🖼️</div>
+                                <div>
+                                    <h3>Anti-Embed</h3>
+                                    <p>Block self-bot custom embed usage.</p>
+                                </div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="anti_embed"
+                                    onchange="updateConfig('anti_embed', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="icon-wrap">✏️</div>
+                                <div>
+                                    <h3>Nickname Protection</h3>
+                                    <p>Prevent nickname change spam.</p>
+                                </div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="anti_nickname"
+                                    onchange="updateConfig('anti_nickname', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        const socket = io();
+        const urlParams = new URLSearchParams(window.location.search);
+        const guildId = urlParams.get('id');
+
+        if (!guildId) window.location.href = '/select';
+
+        // ── BOOTSTRAP ──────────────────────────────────────────────────
+
+        async function loadData() {
+            try {
+                const res = await fetch(`/api/config/${guildId}`);
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+
+                // UI Hydration
+                document.getElementById('server-name').innerText = data.serverName;
+                document.getElementById('server-id').innerText = `ID: ${guildId}`;
+                document.getElementById('server-icon').src = data.guildIcon || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                document.getElementById('brand-icon').src = data.guildIcon || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                document.getElementById('stat-members').innerText = data.memberCount;
+
+                document.getElementById('user-name').innerText = data.user.username;
+                document.getElementById('user-avatar').src = data.user.avatar ? `https://cdn.discordapp.com/avatars/${data.user.id}/${data.user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
+
+                // 1. Populate Dropdowns First
+                const logSelect = document.getElementById('log_channel');
+
+                if (logSelect) {
+                    logSelect.innerHTML = '<option value="">Select a channel...</option>';
+                    data.channels.forEach(ch => {
+                        const opt = document.createElement('option');
+                        opt.value = ch.id;
+                        opt.innerText = `# ${ch.name}`;
+                        logSelect.appendChild(opt);
+                    });
+                }
+
+                // 2. Set Values (Toggles & Inputs)
+                Object.keys(data).forEach(key => {
+                    const el = document.getElementById(key);
+                    if (el) {
+                        if (el.type === 'checkbox') el.checked = data[key] === 1;
+                        else el.value = data[key] || '';
+                    }
+                });
+
+                // Update Overview Status
+                const statusEl = document.getElementById('stat-status');
+                if (data.anti_nuker === 1) {
+                    statusEl.innerText = 'Protected';
+                    statusEl.style.color = 'var(--success)';
+                } else {
+                    statusEl.innerText = 'Not Protected';
+                    statusEl.style.color = 'var(--danger)';
+                }
+
+                loadStats();
+                writeLog('Connected to cluster. Encryption active.', 'info');
+            } catch (e) {
+                console.error(e);
+                alert(`Error: ${e.message || 'Authentication failed'}`);
+                window.location.href = '/select';
+            }
+        }
+
+        async function loadStats() {
+            const res = await fetch('/api/monitor');
+            const data = await res.json();
+            document.getElementById('stat-ping').innerText = data.bot.ping;
+        }
+
+        async function loadWhitelist() {
+            const res = await fetch(`/api/whitelist/${guildId}`);
+            const { users, roles } = await res.json();
+            const container = document.getElementById('whitelist-container');
+            if (container) container.innerHTML = '';
+
+            document.getElementById('stat-wl-roles').innerText = roles.length;
+            document.getElementById('stat-wl-users').innerText = users.length;
+
+            if (users) users.forEach(u => addWlItemToUI(u.id, 'user', u.name));
+            if (roles) roles.forEach(r => addWlItemToUI(r.id, 'role', r.name));
+        }
+
+        function addWlItemToUI(id, type, name = 'Loading...') {
+            // Whitelist UI removed, function kept for compatibility or future use
+        }
+
+        // ── ACTIONS ────────────────────────────────────────────────────
+
+        function showSection(id, el) {
+            document.querySelectorAll('.dashboard-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        async function updateConfig(key, value) {
+            const res = await fetch(`/api/update/${guildId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key, value })
+            });
+            const data = await res.json();
+            if (data.success) {
+                writeLog(`Updated ${key} to ${value}`, 'info');
+            }
+        }
+
+        async function addToWhitelist(type) {
+            const input = document.getElementById('wl-input');
+            const id = input.value.trim();
+            if (!id) return;
+
+            const res = await fetch(`/api/whitelist/add/${guildId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, type })
+            });
+            if (res.ok) {
+                input.value = '';
+                loadWhitelist();
+                writeLog(`Added ${type} ${id} to whitelist`, 'info');
+            }
+        }
+
+        async function removeFromWhitelist(id, type) {
+            const res = await fetch(`/api/whitelist/remove/${guildId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, type })
+            });
+            if (res.ok) {
+                loadWhitelist();
+                writeLog(`Removed ${type} ${id} from whitelist`, 'info');
+            }
+        }
+
+        function confirmAction(action) {
+            const modal = document.getElementById('confirm-modal');
+            const title = document.getElementById('modal-title');
+            const desc = document.getElementById('modal-desc');
+            const confirmBtn = document.getElementById('btn-modal-confirm');
+
+            if (action === 'emergency') {
+                title.innerText = '⚡ Emergency Protocol';
+                desc.innerText = 'Entering emergency mode will enable ultra-strict protection and instant permanent bans. Continue?';
+            } else {
+                title.innerText = '🚨 Global Lockdown';
+                desc.innerText = 'This will freeze the entire server by removing Send Message permissions from @everyone. Continue?';
+            }
+
+            modal.style.display = 'flex';
+            confirmBtn.onclick = async () => {
+                const res = await fetch(`/api/action/${guildId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action })
+                });
+                if (res.ok) {
+                    writeLog(`EXECUTION: ${action.toUpperCase()} activated.`, 'danger');
+                    closeModal();
+                }
+            };
+        }
+
+        function closeModal() {
+            document.getElementById('confirm-modal').style.display = 'none';
+        }
+
+        async function executeAction(action, payload = null) {
+            let finalPayload = payload;
+            if (action === 'verification' && payload === 'setup') {
+                const roleId = document.getElementById('verification_role').value;
+                const channelId = document.getElementById('verification_channel').value;
+                if (!roleId || !channelId) {
+                    writeLog('ERROR: Select both role and channel for verification.', 'danger');
+                    return;
+                }
+                finalPayload = { type: 'setup', roleId, channelId };
+            }
+
+            const res = await fetch(`/api/action/${guildId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action, payload: finalPayload })
+            });
+            const data = await res.json();
+            if (data.success) {
+                writeLog(`ACTION: ${action.toUpperCase()} executed successfully.`, 'info');
+            } else {
+                writeLog(`ERROR: ${data.error || 'Failed to execute ' + action}.`, 'danger');
+            }
+        }
+
+        function writeLog(msg, type = 'info') {
+            // Terminal UI removed, logs now handled via console or alerts if needed
+            console.log(`[${type.toUpperCase()}] ${msg}`);
+        }
+
+        // ── SOCKETS ────────────────────────────────────────────────────
+
+        socket.on('configUpdate', data => {
+            if (data.guildId === guildId) {
+                const el = document.getElementById(data.key);
+                if (el) {
+                    if (el.type === 'checkbox') el.checked = data.value;
+                    else el.value = data.value;
+                }
+                popToast(data);
+            }
+        });
+
+        socket.on('pushLog', data => {
+            if (data.guildId === guildId) {
+                writeLog(`ALERT: ${data.executor} attempted ${data.actionType}. Punishment: ${data.punishment}`, 'danger');
+            }
+        });
+
+        function popToast(data) {
+            const shelf = document.getElementById('toast-shelf');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+
+            const keyNames = {
+                'anti_nuker': 'Anti-Nuke Master Switch',
+                'auto_restore': 'Auto-Restore',
+                'anti_channel_create': 'Anti Channel Creation',
+                'anti_channel_delete': 'Anti Channel Deletion',
+                'anti_channel_update': 'Anti Channel Update',
+                'anti_role_create': 'Anti Role Creation',
+                'anti_role_delete': 'Anti Role Deletion',
+                'anti_role_update': 'Anti Role Update',
+                'anti_webhook_create': 'Anti Webhook Creation',
+                'anti_guild_update': 'Anti Guild Update',
+                'anti_bot_add': 'Anti Bot Add',
+                'anti_kick_ban': 'Kick & Ban Protection',
+                'punishment_type': 'Punishment Protocol',
+                'log_channel': 'Log Channel',
+                'anti_selfbot': 'Anti-Selfbot Master',
+                'anti_spam': 'Message Spam Protection',
+                'anti_flood': 'Flood Protection',
+                'anti_mention': 'Mass Mention Protection',
+                'anti_embed': 'Anti-Embed Protection',
+                'anti_nickname': 'Nickname Protection',
+                'about_text': 'Bot About Text'
+            };
+
+            const name = keyNames[data.key] || data.key;
+            let status = '';
+            if (typeof data.value === 'boolean') {
+                status = data.value ? 'Successfully Enabled' : 'Successfully Disabled';
+            } else {
+                status = `Updated to: ${data.value}`;
+            }
+
+            toast.innerHTML = `<span>🛡️</span> <div><b>${name}</b><p>${status}</p></div>`;
+            shelf.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 500);
+            }, 4000);
+        }
+
+        loadData();
+    </script>
+</body>
+
+</html>

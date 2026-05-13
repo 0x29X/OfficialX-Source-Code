@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfficialX | Server List</title>
+    <link rel="icon" type="image/jpeg" href="https://i.pinimg.com/736x/a4/f0/c1/a4f0c102c6049e2c3440a27caed61534.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050508;
+            --panel: rgba(22, 22, 30, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+            --primary: #5865F2;
+            --text-main: #ffffff;
+            --text-dim: #a1a1aa;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px;
+            background: var(--bg);
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            background-image: radial-gradient(circle at center, rgba(88, 101, 242, 0.05) 0%, transparent 70%);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto 60px auto;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        h2 {
+            font-weight: 800;
+            font-size: 1.8rem;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .guild-card {
+            background: var(--panel);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .guild-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-8px);
+            background: rgba(88, 101, 242, 0.05);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5);
+        }
+
+        .guild-card img {
+            width: 90px;
+            height: 90px;
+            border-radius: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .guild-card h3 {
+            margin: 0 0 5px 0;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .guild-card p {
+            margin: 0;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #2ed573;
+            box-shadow: 0 0 10px #2ed573;
+        }
+
+        .btn-logout {
+            color: #ff4757;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 20px;
+            border: 1px solid rgba(255, 71, 87, 0.2);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 71, 87, 0.1);
+            border-color: #ff4757;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div>
+            <h2>Select Authority</h2>
+            <p style="color: var(--text-dim); margin-top: 5px;">You are currently logged in as an authorized owner.</p>
+        </div>
+        <a href="/api/auth/logout" class="btn-logout">LOGOUT</a>
+    </div>
+
+    <div class="grid" id="guilds">
+        <!-- JS Inserted Content -->
+    </div>
+
+    <script>
+        fetch('/api/user/guilds')
+            .then(res => {
+                if (res.status === 401) {
+                    window.location.href = '/api/auth/login';
+                    return null;
+                }
+                return res.json();
+            })
+            .then(guilds => {
+                if (!guilds) return;
+                const grid = document.getElementById('guilds');
+                if (!guilds.length) {
+                    grid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 100px;">
+                            <p style="color: var(--text-dim); margin-bottom: 20px;">No servers found where you are the owner and OfficialX is active.</p>
+                            <a href="https://discord.com/api/oauth2/authorize?client_id=1501439880440582226&permissions=8&scope=bot%20applications.commands" 
+                               target="_blank" 
+                               style="background: var(--primary); color: white; text-decoration: none; padding: 12px 24px; border-radius: 12px; font-weight: 600; display: inline-block;">
+                               Invite OfficialX to Server
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+                guilds.forEach(g => {
+                    const iconUrl = g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
+                    grid.innerHTML += `
+                        <div class="guild-card" onclick="window.location.href='/dashboard?id=${g.id}'">
+                            <div class="status-badge"></div>
+                            <img src="${iconUrl}" alt="icon">
+                            <h3>${g.name}</h3>
+                            <p>OWNER AUTHORITY GRANTED</p>
+                        </div>
+                    `;
+                });
+            });
+    </script>
+</body>
+
+</html>
